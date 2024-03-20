@@ -1,0 +1,25 @@
+{
+  "name": "avs-menu",
+  "version": "1.0.0",
+  "description": "HTML based sidebar menu for AmuesmentVISON Satellite host to control downstream systems",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UiharuKazari2008/AVS-Menu.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/UiharuKazari2008/AVS-Menu/issues"
+  },
+  "homepage": "https://github.com/UiharuKazari2008/AVS-Menu#readme",
+  "dependencies": {
+    "express": "^4.19.0",
+    "pug": "^3.0.2",
+    "request": "^2.88.2"
+  }
+}

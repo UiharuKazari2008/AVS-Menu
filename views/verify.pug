@@ -1,0 +1,36 @@
+doctype html
+html
+    head
+        title XLink Menu
+        link(rel='stylesheet', href='/static/style.css')
+        link(rel='stylesheet', href='/static/fontawesome-pro-6.5.1-web/css/all.css')
+        script(rel='script', href='/static/menu.js')
+        script(rel='script', href='/static/fontawesome-pro-6.5.1-web/js/all.js')
+    body
+        div.header-bar
+            if (parentIndex)
+                div(onclick="history.back(1); return false;" style="margin-right: auto;")
+                    i.fa-regular.fa-left(style="padding-right: 0.35em;")
+                    span Back
+            else
+                span AmusementVISION
+            div(style="float: right;")
+                if (text)
+                    span !{text}
+                else
+                    span XLink
+                if (icon)
+                    i.fa-regular(class=`fa-${icon}` style="padding-left: 0.35em;")
+        div.error-box
+            div.error-icon
+                i.fa-regular.fa-3x(class=`fa-${warning.icon || "exclamation-triangle"}` style=`${(warning.icon_color) ? "color: " + warning.icon_color + "; " : '' }`)
+            div.error-text
+                span #{warning.header}
+                span(style="padding-top: 0.5em;") #{warning.message}
+        ul
+            a(href=`/item/${url}`)
+                li
+                    span !{warning.ok || "OK"}
+            a(href=`/open`)
+                li.last
+                    span Cancel

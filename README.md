@@ -1,2 +1,2 @@
-# AVS-Menu
-HTML based sidebar menu for AmuesmentVISON Satellite host to control downstream systems
+# XLink Menu
+Server for XLink Interface that overlays a device control menu in AmusementVISION Satellite interface and output.
