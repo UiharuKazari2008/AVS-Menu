@@ -14,25 +14,29 @@ app.get('/', async (req, res) => {
     const items = await Promise.all(menuData.items.map(async e => {
         const status = await new Promise(ok => {
             if (e.status) {
-                request(e.status, {
-                    timeout: 5000
-                }, (error, response, body) => {
-                    if (!error && response.statusCode === 200) {
-                        let statusMessage = body.toString();
-                        let color = '';
-                        if (e.replace) {
-                            const replacement = e.replace.filter(f => body.includes(f[0]))
-                            if (replacement.length > 0) {
-                                const _re = replacement.pop();
-                                statusMessage = _re[1];
-                                color = _re[2];
+                try {
+                    request(e.status, {
+                        timeout: 5000
+                    }, (error, response, body) => {
+                        if (!error && response.statusCode === 200) {
+                            let statusMessage = body.toString();
+                            let color = '';
+                            if (e.replace) {
+                                const replacement = e.replace.filter(f => body.includes(f[0]))
+                                if (replacement.length > 0) {
+                                    const _re = replacement.pop();
+                                    statusMessage = _re[1];
+                                    color = _re[2];
+                                }
                             }
+                            ok([statusMessage, color])
+                        } else {
+                            ok(["FAILURE", 'red'])
                         }
-                        ok([statusMessage, color])
-                    } else {
-                        ok(["FAILURE", 'red'])
-                    }
-                });
+                    });
+                } catch (e) {
+                    ok(["ERROR", 'red'])
+                }
             } else {
                 ok(null)
             }
@@ -52,14 +56,18 @@ app.get('/item/:index', async (req, res) => {
     const selectedItem = menuData.items[index];
     const reqVerify = await new Promise(ok => {
         if (selectedItem.warning && selectedItem.warning.check && selectedItem.warning.match) {
-            request(selectedItem.warning.check, {timeout: 3000}, (error, response, body) => {
-                if (!error && response.statusCode === 200) {
-                    let statusMessage = body.toString();
-                    ok(statusMessage.toLowerCase().includes(selectedItem.warning.match.toLowerCase()) === true)
-                } else {
-                    ok(false)
-                }
-            });
+            try {
+                request(selectedItem.warning.check, {timeout: 3000}, (error, response, body) => {
+                    if (!error && response.statusCode === 200) {
+                        let statusMessage = body.toString();
+                        ok(statusMessage.toLowerCase().includes(selectedItem.warning.match.toLowerCase()) === true)
+                    } else {
+                        ok(false)
+                    }
+                });
+            } catch (e) {
+                ok(false)
+            }
         } else if (selectedItem.warning && selectedItem.warning.always) {
             ok(true)
         } else {
@@ -69,23 +77,27 @@ app.get('/item/:index', async (req, res) => {
     const items = (selectedItem.children) ? await Promise.all(selectedItem.children.map(async e => {
         const status = await new Promise(ok => {
             if (e.status) {
-                request(e.status,  {timeout: 1200}, (error, response, body) => {
-                    if (!error && response.statusCode === 200) {
-                        let statusMessage = body.toString();
-                        let color = '';
-                        if (e.replace) {
-                            const replacement = e.replace.filter(f => body.includes(f[0]))
-                            if (replacement.length > 0) {
-                                const _re = replacement.pop();
-                                statusMessage = _re[1];
-                                color = _re[2];
+                try {
+                    request(e.status,  {timeout: 1200}, (error, response, body) => {
+                        if (!error && response.statusCode === 200) {
+                            let statusMessage = body.toString();
+                            let color = '';
+                            if (e.replace) {
+                                const replacement = e.replace.filter(f => body.includes(f[0]))
+                                if (replacement.length > 0) {
+                                    const _re = replacement.pop();
+                                    statusMessage = _re[1];
+                                    color = _re[2];
+                                }
                             }
+                            ok([statusMessage, color])
+                        } else {
+                            ok(["ERROR", 'red'])
                         }
-                        ok([statusMessage, color])
-                    } else {
-                        ok("FAILURE")
-                    }
-                });
+                    });
+                } catch (e) {
+                    ok(["ERROR", 'red'])
+                }
             } else {
                 ok(null)
             }
@@ -109,14 +121,18 @@ app.get('/item/:parent/:index', async (req, res) => {
     const menuData = JSON.parse(fs.readFileSync('./menu.json').toString());
     const index = req.params.parent;
     const selectedItem = (index === '-1') ? menuData.items[req.params.index].url : menuData.items[index].children[req.params.index].url;
-    request(selectedItem, (error, response, body) => {
-        if (!error && response.statusCode === 200) {
-            const statusMessage = body.toString();
-            res.redirect(`/?_${Date.now()}`);
-        } else {
-            res.render(`error`);
-        }
-    });
+    try {
+        request(selectedItem, (error, response, body) => {
+            if (!error && response.statusCode === 200) {
+                const statusMessage = body.toString();
+                res.redirect(`/?_${Date.now()}`);
+            } else {
+                res.render(`error`);
+            }
+        });
+    } catch (e) {
+        res.render(`error`);
+    }
 });
 
 app.get('/closed', (req,res) => { res.render('closed')})
