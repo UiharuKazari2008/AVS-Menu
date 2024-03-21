@@ -18,4 +18,7 @@ html.page-error
                 i.fa-regular.fa-exclamation-triangle.fa-3x
             div.error-text
                 span System Error
-                span(style="padding-top: 0.5em;") Failed to get a valid response from the MCU unit
+                if (message)
+                    span(style="padding-top: 0.5em;") !{message}
+                else
+                    span(style="padding-top: 0.5em;") Failed to get a valid response from the MCU unit

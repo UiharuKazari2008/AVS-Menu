@@ -106,3 +106,23 @@ a {
     display: flex;
 }
 
+ul.image-grid {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding-left: 0.25em;
+    padding-right: 0.25em;
+}
+a.image {
+    width: 50%;
+}
+.image li {
+    height: 128px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    border-bottom: none;
+    margin-bottom: 0.5em;
+    margin-left: 0.25em;
+    margin-right: 0.25em;
+}

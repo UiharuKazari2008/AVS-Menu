@@ -24,7 +24,7 @@ html
         ul
             each item, index in items
                 a(tabindex=0 href=`${(item.children) ? `/item/${index}` : (parentIndex) ? `/${(verify) ? 'verify' : 'item'}/${parentIndex}/${index}` : `/${(verify) ? 'verify' : 'item'}/-1/${index}`}?_${Date.now()}`)
-                    li(class=`${(items.length - 1 === index) ? 'last' : ''}`)
+                    li(class=`${(!captures && items.length - 1 === index) ? 'last' : ''}`)
                         if (item.icon)
                             div.icon-holder
                                 i.fa-regular(class=`fa-${item.icon}`)
@@ -38,6 +38,12 @@ html
                             i.fa-regular.fa-chevron-right(style="padding-left: 0.35em;")
                         if (item.status)
                             span.status(style=`padding-left: 0.35em; ${(item.status[1]) ? "color: " + item.status[1] + ";" : ''}`) !{item.status[0]}!{(item.append) ? item.append : ''}
+            if (captures)
+                a(href="/captures")
+                    li.last
+                        div.icon-holder
+                            i.fa-regular.fa-image-landscape
+                            span(style="flex-grow: 1;") Saved Captures
         if(!parentIndex)
             div.close-button
                 a(href="/closed")
