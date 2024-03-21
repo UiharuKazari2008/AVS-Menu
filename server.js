@@ -164,12 +164,12 @@ app.get('/item/:parent/:index', async (req, res) => {
 
 app.get('/captures', async (req, res) => {
     try {
-        const files = (fs.readdirSync(resolve(config.captures))).reverse().slice(0,100).map(e => {
+        const files = (fs.readdirSync(resolve(config.captures))).reverse().map(e => {
             return {
                 date: fs.statSync(join(resolve(config.captures), e)).mtimeMs,
                 filename: e
             }
-        }).filter(e => (!!(config.all_captures) || (Date.now() - 604800000 <= e.date)));
+        }).filter(e => e.filename.endsWith('png') && (!!(config.all_captures) || ((new Date()).getTime() - 604800000 <= e.date))).slice(0,100);
         res.render('screenshots', {
             items: files
         })
