@@ -170,7 +170,6 @@ app.get('/captures', async (req, res) => {
                 filename: e
             }
         }).filter(e => e.filename.endsWith('png') && (!!(config.all_captures) || ((new Date()).getTime() - 604800000 <= e.date)))
-            .reverse()
             .sort((a, b) => a.date - b.date)
             .slice(0,100);
         res.render('screenshots', {
