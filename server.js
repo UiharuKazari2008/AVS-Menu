@@ -51,10 +51,17 @@ app.get('/', async (req, res) => {
                 status,
             }
         }))
-        res.render('index', {items, captures: !!(config.captures)});
+        res.render('index', {
+            items,
+            captures: !!(config.captures),
+            inline: (req.headers['user-agent'].includes("OBS"))
+        });
     } catch (e) {
         console.error(e);
-        res.render(`error`, { message: e.message });;
+        res.render(`error`, {
+            message: e.message,
+            inline: (req.headers['user-agent'].includes("OBS"))
+        });
     }
 });
 // Handle item click
@@ -116,10 +123,19 @@ app.get('/item/:index', async (req, res) => {
                 status,
             }
         })) : undefined
-        res.render('index', { verify: reqVerify, ...selectedItem, items, parentIndex: req.params.index });
+        res.render('index', {
+            verify: reqVerify,
+            ...selectedItem,
+            items,
+            parentIndex: req.params.index,
+            inline: (req.headers['user-agent'].includes("OBS"))
+        });
     } catch (e) {
         console.error(e);
-        res.render(`error`, { message: e.message });;
+        res.render(`error`, {
+            message: e.message,
+            inline: (req.headers['user-agent'].includes("OBS"))
+        });
     }
 });
 // Handle warning before action
@@ -131,11 +147,15 @@ app.get('/verify/:parent/:index', async (req, res) => {
         res.render(`verify`, {
             ...selectedItem,
             parentIndex: req.params.index,
-            url: `${req.params.parent}/${req.params.index}`
+            url: `${req.params.parent}/${req.params.index}`,
+            inline: (req.headers['user-agent'].includes("OBS"))
         });
     } catch (e) {
         console.error(e);
-        res.render(`error`, { message: e.message });;
+        res.render(`error`, {
+            message: e.message,
+            inline: (req.headers['user-agent'].includes("OBS"))
+        });
     }
 });
 // Send HTTP call
@@ -150,15 +170,24 @@ app.get('/item/:parent/:index', async (req, res) => {
                     const statusMessage = body.toString();
                     res.redirect(`/?_${Date.now()}`);
                 } else {
-                    res.render(`error`, { message: (error)? error.message : (body) ? body.toString() : undefined });
+                    res.render(`error`, {
+                        message: (error)? error.message : (body) ? body.toString() : undefined,
+                        inline: (req.headers['user-agent'].includes("OBS"))
+                    });
                 }
             });
         } catch (e) {
-            res.render(`error`, { message: e.message });;
+            res.render(`error`, {
+                message: e.message,
+                inline: (req.headers['user-agent'].includes("OBS"))
+            });
         }
     } catch (e) {
         console.error(e);
-        res.render(`error`, { message: e.message });
+        res.render(`error`, {
+            message: e,
+            inline: (req.headers['user-agent'].includes("OBS"))
+        });
     }
 });
 
@@ -174,10 +203,14 @@ app.get('/captures', async (req, res) => {
             .reverse()
             .slice(0,100);
         res.render('screenshots', {
-            items: files
+            items: files,
+            inline: (req.headers['user-agent'].includes("OBS"))
         })
     } catch (e) {
-        res.render(`error`, { message: e.message });
+        res.render(`error`, {
+            message: e.message,
+            inline: (req.headers['user-agent'].includes("OBS"))
+        });
     }
 });
 
