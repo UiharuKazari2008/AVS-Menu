@@ -38,7 +38,7 @@ html
                             i.fa-regular.fa-chevron-right(style="padding-left: 0.35em;")
                         if (item.status)
                             span.status(style=`padding-left: 0.35em; ${(item.status[1]) ? "color: " + item.status[1] + ";" : ''}`) !{item.status[0]}!{(item.append) ? item.append : ''}
-            if (captures)
+            if (captures && !parentIndex && !inline)
                 a(href="/captures")
                     li.last
                         div.icon-holder
