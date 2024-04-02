@@ -18,7 +18,7 @@ html
                 if (text)
                     span !{text}
                 else
-                    span XLink
+                    img(src="/static/logo.png" style="height: 0.95em;")
                 if (icon)
                     i.fa-regular(class=`fa-${icon}` style="padding-left: 0.35em;")
         ul
@@ -44,11 +44,16 @@ html
                         div.icon-holder
                             i.fa-regular.fa-image-landscape
                         span(style="flex-grow: 1;") Saved Captures
-        if (!parentIndex && inline)
-            div.close-button
+        div.close-button
+            if (inline)
                 a(href="/open")
                     i.fa-regular.fa-list(style="padding-right: 0.35em;")
                     span Devices
-                a(href=`/device/${key}/closed` style="margin-left: auto;")
-                    i.fa-regular.fa-times(style="padding-right: 0.35em;")
-                    span Close
+                if (!parentIndex)
+                    a(href=`/device/${key}/closed` style="margin-left: auto;")
+                        i.fa-regular.fa-times(style="padding-right: 0.35em;")
+                        span Close
+            else
+                a(href="/open" style="margin-left: auto;")
+                    i.fa-regular.fa-list(style="padding-right: 0.35em;")
+                    span Devices

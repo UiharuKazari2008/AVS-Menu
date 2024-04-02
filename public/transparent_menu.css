@@ -77,12 +77,14 @@ a, a:visited, a:hover {
 .badge {
     background-color: white;
     color: black;
-    padding: 0.2em 0.4em;
+    padding: 0.2em 0.5em;
     border-radius: 0.6em;
     font-size: 21px;
     font-weight: bold;
     margin: 0 0.5em;
     height: 1.5em;
+    display: inline-flex;
+    align-items: center;
 }
 .info-bar {
     position: fixed;
