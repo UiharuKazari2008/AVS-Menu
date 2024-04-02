@@ -7,11 +7,18 @@ html
         script(rel='script', href='/static/menu.js')
         script(rel='script', href='/static/fontawesome-pro-6.5.1-web/js/all.js')
     body
-        div.clicker(onclick="window.location.pathname = '/open'; return false;")
+        if (key)
+            div.clicker(onclick=`window.location.pathname = "/device/${key}/open"; return false;`)
+        else
+            div.clicker(onclick="window.location.pathname = `/open`; return false;")
         div.info-bar
             span Press
             .badge
                 span XLink
             span for controls
-        script.
-            setTimeout(() => { window.location.pathname = '/closed'; }, 10000);
+        if (key)
+            script.
+                setTimeout(() => { window.location.pathname = `/device/!{key}/closed`; }, 10000);
+        else
+            script.
+                setTimeout(() => { window.location.pathname = `/closed`; }, 10000);

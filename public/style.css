@@ -90,7 +90,8 @@ a {
     background: #7d0000;
     bottom: 0;
     position: fixed;
-    width: 100%;
+    width: calc(100% - 1em);
+    display: flex;
 }
 .badge {
     background-color: white;

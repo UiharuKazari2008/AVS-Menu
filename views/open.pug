@@ -8,7 +8,10 @@ html
         script(rel='script', href='/static/fontawesome-pro-6.5.1-web/js/all.js')
     body
         div.header-bar
-            span AmusementVISION
+            if (key)
+                span AmusementVISION
+            else
+                span Global Management
             div(style="float: right;")
                span XLink
         div.error-box
@@ -16,5 +19,9 @@ html
                 i.fa-regular.fa-loader.fa-2x.fa-spin
             div.error-text
                 span Connecting...
-        script.
-            window.location.pathname = "/"
+        if (key)
+            script.
+                window.location.pathname = `/device/!{key}`
+        else
+            script.
+                window.location.pathname = `/`

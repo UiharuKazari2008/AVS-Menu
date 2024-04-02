@@ -7,4 +7,7 @@ html
         script(rel='script', href='/static/menu.js')
         script(rel='script', href='/static/fontawesome-pro-6.5.1-web/js/all.js')
     body
-        div.clicker(onclick="window.location.pathname = '/open'; return false;")
+        if (key)
+            div.clicker(onclick=`window.location.pathname = "/device/${key}/open"; return false;`)
+        else
+            div.clicker(onclick="window.location.pathname = `/open`; return false;")

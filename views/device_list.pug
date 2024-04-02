@@ -9,11 +9,11 @@ html
     body
         div.header-bar
             if (parentIndex)
-                a(href=`/device/${key}/open` style="margin-right: auto;")
+                a(href="/open" style="margin-right: auto;")
                     i.fa-regular.fa-left(style="padding-right: 0.35em;")
                     span Back
             else
-                span AmusementVISION
+                span Global Management
             div(style="float: right;")
                 if (text)
                     span !{text}
@@ -23,32 +23,21 @@ html
                     i.fa-regular(class=`fa-${icon}` style="padding-left: 0.35em;")
         ul
             each item, index in items
-                a(tabindex=0 href=`/device/${key}/${(item.children) ? 'menu' : (verify) ? 'verify' : 'send'}/${(item.children) ? index : `${parentIndex || '-1'}/${index}`}?_${Date.now()}`)
-                    li(class=`${(!captures && items.length - 1 === index) ? 'last' : ''}`)
+                a(tabindex=0 href=((item.url) ? item.url : `/device/${item.key}/open?_${Date.now()}`))
+                    li(class=`${(items.length - 1 === index) ? 'last' : ''}`)
                         if (item.icon)
                             div.icon-holder
                                 i.fa-regular(class=`fa-${item.icon}`)
-                        span(style="flex-grow: 1;") !{item.text}
+                        span(style="flex-grow: 1;") !{item.name}
                         if (item.badges)
                             div.badges
                                 each badge in item.badges
                                     .badge(style=`${(badge.color) ? "background-color: " + badge.color + ";" : ''}`)
                                         span(style=`${(badge.text_color) ? "color: " + badge.text_color + ";" : ''}`) !{badge.text}
-                        //if (item.children)
-                            i.fa-regular.fa-chevron-right(style="padding-left: 0.35em;")
                         if (item.status)
                             span.status(style=`padding-left: 0.35em; ${(item.status[1]) ? "color: " + item.status[1] + ";" : ''}`) !{item.status[0]}!{(item.append) ? item.append : ''}
-            if (captures && !parentIndex && !inline)
-                a(href=`/device/${key}/captures`)
-                    li.last
-                        div.icon-holder
-                            i.fa-regular.fa-image-landscape
-                        span(style="flex-grow: 1;") Saved Captures
-        if (!parentIndex && inline)
+        if (inline)
             div.close-button
-                a(href="/open")
-                    i.fa-regular.fa-list(style="padding-right: 0.35em;")
-                    span Devices
-                a(href=`/device/${key}/closed` style="margin-left: auto;")
+                a(href=`/closed` style="margin-right: auto;")
                     i.fa-regular.fa-times(style="padding-right: 0.35em;")
                     span Close

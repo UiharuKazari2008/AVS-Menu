@@ -12,48 +12,52 @@ app.use('/static', express.static('./public'));
 if (config.captures)
     app.use('/captures/images', express.static(resolve(config.captures)));
 
-// Render the main menu
 app.get('/', async (req, res) => {
     try {
-        const menuData = JSON.parse(fs.readFileSync('./menu.json').toString());
-        const items = await Promise.all(menuData.items.map(async e => {
-            const status = await new Promise(ok => {
-                if (e.status) {
-                    try {
-                        request(e.status, {
-                            timeout: 5000
-                        }, (error, response, body) => {
-                            if (!error && response.statusCode === 200) {
-                                let statusMessage = body.toString();
-                                let color = '';
-                                if (e.replace) {
-                                    const replacement = e.replace.filter(f => body.includes(f[0]))
-                                    if (replacement.length > 0) {
-                                        const _re = replacement.pop();
-                                        statusMessage = _re[1];
-                                        color = _re[2];
-                                    }
-                                }
-                                ok([statusMessage, color])
-                            } else {
-                                ok(["FAILURE", 'red'])
-                            }
-                        });
-                    } catch (e) {
-                        ok(["ERROR", 'red'])
-                    }
-                } else {
-                    ok(null)
-                }
+        const deviceList = JSON.parse(fs.readFileSync('./menu.json').toString());
+        const items = await Promise.all((Object.keys(deviceList.devices))
+            .sort((a,b) => {
+                return deviceList.devices[a].position - deviceList.devices[b].position
             })
-            return {
-                ...e,
-                status,
-            }
-        }))
-        res.render('index', {
+            .map(async k => {
+                const e = deviceList.devices[k];
+                const status = await new Promise(ok => {
+                    if (e.status) {
+                        try {
+                            request(e.status, {
+                                timeout: 10000
+                            }, (error, response, body) => {
+                                if (!error && response.statusCode === 200) {
+                                    let statusMessage = body.toString();
+                                    let color = '';
+                                    if (e.replace) {
+                                        const replacement = e.replace.filter(f => body.includes(f[0]))
+                                        if (replacement.length > 0) {
+                                            const _re = replacement.pop();
+                                            statusMessage = _re[1];
+                                            color = _re[2];
+                                        }
+                                    }
+                                    ok([statusMessage, color])
+                                } else {
+                                    ok(["FAILURE", 'red'])
+                                }
+                            });
+                        } catch (e) {
+                            ok(["ERROR", 'red'])
+                        }
+                    } else {
+                        ok(null)
+                    }
+                })
+                return {
+                    ...e,
+                    key: k,
+                    status: status,
+                }
+            }))
+        res.render('device_list', {
             items,
-            captures: !!(config.captures),
             inline: (req.headers['user-agent'].includes("OBS"))
         });
     } catch (e) {
@@ -64,10 +68,114 @@ app.get('/', async (req, res) => {
         });
     }
 });
-// Handle item click
-app.get('/item/:index', async (req, res) => {
+app.get('/device/:device', async (req, res) => {
     try {
-        const menuData = JSON.parse(fs.readFileSync('./menu.json').toString());
+        const deviceList = JSON.parse(fs.readFileSync('./menu.json').toString());
+        const deviceID = req.params.device;
+        const menuData = deviceList.devices[deviceID];
+        if (menuData && menuData.items) {
+            const items = await Promise.all(menuData.items.map(async e => {
+                const status = await new Promise(ok => {
+                    if (e.pre_status) {
+                        request(e.pre_status.url, {
+                            timeout: 10000
+                        }, (error, response, body) => {
+                            if (!error && response.statusCode === 200) {
+                                let statusMessage = body.toString();
+                                if (statusMessage.includes(e.pre_status.match)) {
+                                    request(e.status, {
+                                        timeout: 10000
+                                    }, (error, response, body) => {
+                                        if (!error && response.statusCode === 200) {
+                                            let statusMessage = body.toString();
+                                            let color = '';
+                                            if (e.replace) {
+                                                const replacement = e.replace.filter(f => body.toLowerCase().includes(f[0].toLowerCase()))
+                                                if (replacement.length > 0) {
+                                                    const _re = replacement.pop();
+                                                    statusMessage = _re[1];
+                                                    color = _re[2];
+                                                }
+                                            }
+                                            ok([statusMessage, color])
+                                        } else {
+                                            ok(["FAILURE", 'red'])
+                                        }
+                                    });
+                                } else {
+                                    let color = '';
+                                    if (e.pre_status.replace) {
+                                        const replacement = e.pre_status.replace.filter(f => body.toLowerCase().includes(f[0].toLowerCase()))
+                                        if (replacement.length > 0) {
+                                            const _re = replacement.pop();
+                                            statusMessage = _re[1];
+                                            color = _re[2];
+                                        }
+                                    }
+                                    ok([statusMessage, color])
+                                }
+                            } else {
+                                ok(["FAILURE", 'red'])
+                            }
+                        });
+                    } else if (e.status) {
+                        try {
+                            request(e.status, {
+                                timeout: 10000
+                            }, (error, response, body) => {
+                                if (!error && response.statusCode === 200) {
+                                    let statusMessage = body.toString();
+                                    let color = '';
+                                    if (e.replace) {
+                                        const replacement = e.replace.filter(f => body.toLowerCase().includes(f[0].toLowerCase()))
+                                        if (replacement.length > 0) {
+                                            const _re = replacement.pop();
+                                            statusMessage = _re[1];
+                                            color = _re[2];
+                                        }
+                                    }
+                                    ok([statusMessage, color])
+                                } else {
+                                    ok(["FAILURE", 'red'])
+                                }
+                            });
+                        } catch (e) {
+                            ok(["ERROR", 'red'])
+                        }
+                    } else {
+                        ok(null)
+                    }
+                })
+                return {
+                    ...e,
+                    status,
+                }
+            }))
+            res.render('index', {
+                key: deviceID,
+                items,
+                captures: !!(config.captures),
+                inline: (req.headers['user-agent'].includes("OBS"))
+            });
+        } else {
+            res.render(`error`, {
+                message: "Invalid Device ID",
+                inline: (req.headers['user-agent'].includes("OBS"))
+            });
+        }
+    } catch (e) {
+        console.error(e);
+        res.render(`error`, {
+            message: e.message,
+            inline: (req.headers['user-agent'].includes("OBS"))
+        });
+    }
+});
+app.get('/device/:device/menu/:index', async (req, res) => {
+    try {
+        const deviceList = JSON.parse(fs.readFileSync('./menu.json').toString());
+        const deviceID = req.params.device;
+        const menuData = deviceList.devices[deviceID];
         const index = req.params.index;
         const selectedItem = menuData.items[index];
         const reqVerify = await new Promise(ok => {
@@ -124,6 +232,7 @@ app.get('/item/:index', async (req, res) => {
             }
         })) : undefined
         res.render('index', {
+            key: deviceID,
             verify: reqVerify,
             ...selectedItem,
             items,
@@ -138,37 +247,18 @@ app.get('/item/:index', async (req, res) => {
         });
     }
 });
-// Handle warning before action
-app.get('/verify/:parent/:index', async (req, res) => {
+app.get('/device/:device/send/:parent/:index', async (req, res) => {
     try {
-        const menuData = JSON.parse(fs.readFileSync('./menu.json').toString());
-        const index = req.params.parent;
-        const selectedItem = (index === '-1') ? menuData.items[req.params.index] : menuData.items[index];
-        res.render(`verify`, {
-            ...selectedItem,
-            parentIndex: req.params.index,
-            url: `${req.params.parent}/${req.params.index}`,
-            inline: (req.headers['user-agent'].includes("OBS"))
-        });
-    } catch (e) {
-        console.error(e);
-        res.render(`error`, {
-            message: e.message,
-            inline: (req.headers['user-agent'].includes("OBS"))
-        });
-    }
-});
-// Send HTTP call
-app.get('/item/:parent/:index', async (req, res) => {
-    try {
-        const menuData = JSON.parse(fs.readFileSync('./menu.json').toString());
+        const deviceList = JSON.parse(fs.readFileSync('./menu.json').toString());
+        const deviceID = req.params.device;
+        const menuData = deviceList.devices[deviceID];
         const index = req.params.parent;
         const selectedItem = (index === '-1') ? menuData.items[req.params.index].url : menuData.items[index].children[req.params.index].url;
         try {
             request(selectedItem, (error, response, body) => {
                 if (!error && response.statusCode === 200) {
                     const statusMessage = body.toString();
-                    res.redirect(`/?_${Date.now()}`);
+                    res.redirect(`/device/${deviceID}/open/?_${Date.now()}`);
                 } else {
                     res.render(`error`, {
                         message: (error)? error.message : (body) ? body.toString() : undefined,
@@ -190,8 +280,30 @@ app.get('/item/:parent/:index', async (req, res) => {
         });
     }
 });
+app.get('/device/:device/verify/:parent/:index', async (req, res) => {
+    try {
+        const deviceList = JSON.parse(fs.readFileSync('./menu.json').toString());
+        const deviceID = req.params.device;
+        const menuData = deviceList.devices[deviceID];
+        const index = req.params.parent;
+        const selectedItem = (index === '-1') ? menuData.items[req.params.index] : menuData.items[index];
+        res.render(`verify`, {
+            key: deviceID,
+            ...selectedItem,
+            parentIndex: req.params.index,
+            url: `${req.params.parent}/${req.params.index}`,
+            inline: (req.headers['user-agent'].includes("OBS"))
+        });
+    } catch (e) {
+        console.error(e);
+        res.render(`error`, {
+            message: e.message,
+            inline: (req.headers['user-agent'].includes("OBS"))
+        });
+    }
+});
 
-app.get('/captures', async (req, res) => {
+app.get('/device/:device/captures', async (req, res) => {
     try {
         const files = (fs.readdirSync(resolve(config.captures))).map(e => {
             return {
@@ -213,6 +325,10 @@ app.get('/captures', async (req, res) => {
         });
     }
 });
+
+app.get('/device/:device/closed', (req,res) => { res.render('closed', { key: req.params.device })})
+app.get('/device/:device/open', (req,res) => { res.render('open', { key: req.params.device })})
+app.get('/device/:device/start', (req,res) => { res.render('startup', { key: req.params.device })})
 
 app.get('/closed', (req,res) => { res.render('closed')})
 app.get('/open', (req,res) => { res.render('open')})
