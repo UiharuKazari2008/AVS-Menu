@@ -28,6 +28,7 @@ li {
 }
 li.last {
     border-bottom: none;
+    margin-bottom: 2em;
 }
 a:hover > li,
 a:focus > li,
@@ -37,7 +38,13 @@ a:active > li {
 
 a:hover,
 a:focus,
-a:active {
+a:active,
+.slider-item:hover,
+.slider-item:focus,
+.slider-item:active,
+.slider-item:hover > li > a,
+.slider-item:focus > li > a,
+.slider-item:active > li > a {
     background-color: white;
     color: black;
 }
@@ -126,4 +133,97 @@ a.image {
     margin-bottom: 0.5em;
     margin-left: 0.25em;
     margin-right: 0.25em;
+}
+
+.slider {
+    -webkit-appearance: none;
+    height: 25px;
+    background: #414141;
+    outline: none;
+    opacity: .75;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+
+.slider:hover {
+    opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 35px;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 15px;
+    height: 35px;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+.slider-item:hover > li,
+.slider-item:focus > li,
+.slider-item:active > li,
+.slider-item:hover > li > a,
+.slider-item:focus > li > a,
+.slider-item:active > li > a {
+    background-color: #c9c9c9;
+}
+.slider-item:hover .slider,
+.slider-item:focus .slider,
+.slider-item:active .slider {
+    background-color: #474747;
+}
+.slider-item:hover .slider::-webkit-slider-thumb,
+.slider-item:focus .slider::-webkit-slider-thumb,
+.slider-item:active .slider::-webkit-slider-thumb,
+.slider-item:hover .slider::-moz-range-thumb,
+.slider-item:focus .slider::-moz-range-thumb,
+.slider-item:active .slider::-moz-range-thumb {
+    background: #000!important;
+}
+.toggle-holder {
+    border: solid white 3px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    padding: 0.125em;
+}
+.toggle-holder > a {
+    display: flex;
+    align-items: center;
+}
+.toggle-holder > a > span {
+    font-size: 0.70em;
+    padding: 0 .5em;
+}
+.toggle-holder > a > .icon-holder > i {
+    font-size: 0.70em;
+    padding: 0 .5em;
+}
+a.toggle-active {
+    background: white;
+    color: black;
+}
+
+.slider-item:hover .toggle-holder,
+.slider-item:focus .toggle-holder,
+.slider-item:active .toggle-holder {
+    border-color: black;
+}
+.slider-item:hover .toggle-holder > a,
+.slider-item:focus .toggle-holder > a,
+.slider-item:active .toggle-holder > a {
+    color: black;
+}
+.slider-item:hover a.toggle-active,
+.slider-item:focus a.toggle-active,
+.slider-item:active a.toggle-active {
+    background-color: black;
+    color: white;
 }

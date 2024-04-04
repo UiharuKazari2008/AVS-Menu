@@ -67,6 +67,8 @@ app.get('/', async (req, res) => {
             inline: (req.headers['user-agent'].includes("OBS"))
         });
     }
+    clearTimeout(refreshMarkers);
+    scanStatusMarkers();
 });
 app.get('/device/:device', async (req, res) => {
     try {
@@ -74,83 +76,15 @@ app.get('/device/:device', async (req, res) => {
         const deviceID = req.params.device;
         const menuData = deviceList.devices[deviceID];
         if (menuData && menuData.items) {
-            const items = await Promise.all(menuData.items.map(async e => {
-                const status = await new Promise(ok => {
-                    if (e.pre_status) {
-                        request(e.pre_status.url, {
-                            timeout: 10000
-                        }, (error, response, body) => {
-                            if (!error && response.statusCode === 200) {
-                                let statusMessage = body.toString();
-                                if (statusMessage.includes(e.pre_status.match)) {
-                                    request(e.status, {
-                                        timeout: 10000
-                                    }, (error, response, body) => {
-                                        if (!error && response.statusCode === 200) {
-                                            let statusMessage = body.toString();
-                                            let color = '';
-                                            if (e.replace) {
-                                                const replacement = e.replace.filter(f => body.toLowerCase().includes(f[0].toLowerCase()))
-                                                if (replacement.length > 0) {
-                                                    const _re = replacement.pop();
-                                                    statusMessage = _re[1];
-                                                    color = _re[2];
-                                                }
-                                            }
-                                            ok([statusMessage, color])
-                                        } else {
-                                            ok(["FAILURE", 'red'])
-                                        }
-                                    });
-                                } else {
-                                    let color = '';
-                                    if (e.pre_status.replace) {
-                                        const replacement = e.pre_status.replace.filter(f => body.toLowerCase().includes(f[0].toLowerCase()))
-                                        if (replacement.length > 0) {
-                                            const _re = replacement.pop();
-                                            statusMessage = _re[1];
-                                            color = _re[2];
-                                        }
-                                    }
-                                    ok([statusMessage, color])
-                                }
-                            } else {
-                                ok(["FAILURE", 'red'])
-                            }
-                        });
-                    } else if (e.status) {
-                        try {
-                            request(e.status, {
-                                timeout: 10000
-                            }, (error, response, body) => {
-                                if (!error && response.statusCode === 200) {
-                                    let statusMessage = body.toString();
-                                    let color = '';
-                                    if (e.replace) {
-                                        const replacement = e.replace.filter(f => body.toLowerCase().includes(f[0].toLowerCase()))
-                                        if (replacement.length > 0) {
-                                            const _re = replacement.pop();
-                                            statusMessage = _re[1];
-                                            color = _re[2];
-                                        }
-                                    }
-                                    ok([statusMessage, color])
-                                } else {
-                                    ok(["FAILURE", 'red'])
-                                }
-                            });
-                        } catch (e) {
-                            ok(["ERROR", 'red'])
-                        }
-                    } else {
-                        ok(null)
-                    }
-                })
+            const items = menuData.items.map((e,i) => {
+                const status = (statusMarkers[deviceID]) ? statusMarkers[deviceID][i] : undefined
+                const isOn = (status && e.toggle_match) ? e.toggle_match.filter(e => status[0].toLowerCase().includes(e.toLowerCase())).length !== 0 : false
                 return {
                     ...e,
+                    isOn,
                     status,
                 }
-            }))
+            })
             res.render('index', {
                 key: deviceID,
                 items,
@@ -198,7 +132,7 @@ app.get('/device/:device/menu/:index', async (req, res) => {
                 ok(false)
             }
         })
-        const items = (selectedItem.children) ? await Promise.all(selectedItem.children.map(async e => {
+        const items = (selectedItem.children) ? await Promise.all(selectedItem.children.map(async (e,i) => {
             const status = await new Promise(ok => {
                 if (e.status) {
                     try {
@@ -226,8 +160,10 @@ app.get('/device/:device/menu/:index', async (req, res) => {
                     ok(null)
                 }
             })
+            const isOn = (status && e.toggle_match) ? e.toggle_match.filter(e => status[0].toLowerCase().includes(e.toLowerCase())).length !== 0 : false
             return {
                 ...e,
+                isOn,
                 status,
             }
         })) : undefined
@@ -255,9 +191,78 @@ app.get('/device/:device/send/:parent/:index', async (req, res) => {
         const index = req.params.parent;
         const selectedItem = (index === '-1') ? menuData.items[req.params.index].url : menuData.items[index].children[req.params.index].url;
         try {
-            request(selectedItem, (error, response, body) => {
+            request(selectedItem, async (error, response, body) => {
                 if (!error && response.statusCode === 200) {
                     const statusMessage = body.toString();
+                    await scanStatusMarkers(deviceID);
+                    res.redirect(`/device/${deviceID}/open/?_${Date.now()}`);
+                } else {
+                    res.render(`error`, {
+                        message: (error)? error.message : (body) ? body.toString() : undefined,
+                        inline: (req.headers['user-agent'].includes("OBS"))
+                    });
+                }
+            });
+        } catch (e) {
+            res.render(`error`, {
+                message: e.message,
+                inline: (req.headers['user-agent'].includes("OBS"))
+            });
+        }
+    } catch (e) {
+        console.error(e);
+        res.render(`error`, {
+            message: e,
+            inline: (req.headers['user-agent'].includes("OBS"))
+        });
+    }
+});
+app.get('/device/:device/slider_value/:parent/:index/:value', async (req, res) => {
+    try {
+        const deviceList = JSON.parse(fs.readFileSync('./menu.json').toString());
+        const deviceID = req.params.device;
+        const menuData = deviceList.devices[deviceID];
+        const index = req.params.parent;
+        const selectedItem = (index === '-1') ? menuData.items[req.params.index].slider : menuData.items[index].children[req.params.index].slider;
+        try {
+            request(selectedItem + req.params.value, async (error, response, body) => {
+                if (!error && response.statusCode === 200) {
+                    const statusMessage = body.toString();
+                    await scanStatusMarkers(deviceID);
+                    res.redirect(`/device/${deviceID}/open/?_${Date.now()}`);
+                } else {
+                    res.render(`error`, {
+                        message: (error)? error.message : (body) ? body.toString() : undefined,
+                        inline: (req.headers['user-agent'].includes("OBS"))
+                    });
+                }
+            });
+        } catch (e) {
+            res.render(`error`, {
+                message: e.message,
+                inline: (req.headers['user-agent'].includes("OBS"))
+            });
+        }
+    } catch (e) {
+        console.error(e);
+        res.render(`error`, {
+            message: e,
+            inline: (req.headers['user-agent'].includes("OBS"))
+        });
+    }
+});
+app.get('/device/:device/toggle_item/:parent/:index/:value', async (req, res) => {
+    try {
+        const deviceList = JSON.parse(fs.readFileSync('./menu.json').toString());
+        const deviceID = req.params.device;
+        const menuData = deviceList.devices[deviceID];
+        const index = req.params.parent;
+        const selectedItem = (index === '-1') ? menuData.items[req.params.index].toggle : menuData.items[index].children[req.params.index].toggle;
+        try {
+            request(selectedItem[parseInt(req.params.value)], async (error, response, body) => {
+                if (!error && response.statusCode === 200) {
+                    const statusMessage = body.toString();
+                    await scanStatusMarkers(deviceID);
                     res.redirect(`/device/${deviceID}/open/?_${Date.now()}`);
                 } else {
                     res.render(`error`, {
@@ -328,7 +333,10 @@ app.get('/device/:device/captures', async (req, res) => {
 
 app.get('/device/:device/closed', (req,res) => { res.render('closed', { key: req.params.device })})
 app.get('/device/:device/open', (req,res) => { res.render('open', { key: req.params.device })})
-app.get('/device/:device/start', (req,res) => { res.render('startup', { key: req.params.device })})
+app.get('/device/:device/start', (req,res) => {
+    scanStatusMarkers(req.params.device);
+    res.render('startup', { key: req.params.device })
+})
 
 app.get('/closed', (req,res) => { res.render('closed')})
 app.get('/open', (req,res) => { res.render('open')})
@@ -336,4 +344,102 @@ app.get('/start', (req,res) => { res.render('startup')})
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
+    scanStatusMarkers();
 });
+
+let statusMarkers = {};
+let refreshMarkers = null;
+async function scanStatusMarkers(device) {
+    try {
+        const deviceList = JSON.parse(fs.readFileSync('./menu.json').toString());
+        await Promise.all((Object.keys(deviceList.devices))
+            .filter(k => !device || (device === k))
+            .map(async k => {
+                const menuData = deviceList.devices[k];
+                let statues = [];
+                if (menuData && menuData.items) {
+                    const items = await Promise.all(menuData.items.map(async (e,i) => {
+                        statues[i] = await new Promise(ok => {
+                            if (e.pre_status) {
+                                request(e.pre_status.url, {
+                                    timeout: 10000
+                                }, (error, response, body) => {
+                                    if (!error && response.statusCode === 200) {
+                                        let statusMessage = body.toString();
+                                        if (statusMessage.includes(e.pre_status.match)) {
+                                            request(e.status, {
+                                                timeout: 10000
+                                            }, (error, response, body) => {
+                                                if (!error && response.statusCode === 200) {
+                                                    let statusMessage = body.toString();
+                                                    let color = '';
+                                                    if (e.replace) {
+                                                        const replacement = e.replace.filter(f => body.toLowerCase().includes(f[0].toLowerCase()))
+                                                        if (replacement.length > 0) {
+                                                            const _re = replacement.pop();
+                                                            statusMessage = _re[1];
+                                                            color = _re[2];
+                                                        }
+                                                    }
+                                                    ok([statusMessage, color])
+                                                } else {
+                                                    ok(["FAILURE", 'red'])
+                                                }
+                                            });
+                                        } else {
+                                            let color = '';
+                                            if (e.pre_status.replace) {
+                                                const replacement = e.pre_status.replace.filter(f => body.toLowerCase().includes(f[0].toLowerCase()))
+                                                if (replacement.length > 0) {
+                                                    const _re = replacement.pop();
+                                                    statusMessage = _re[1];
+                                                    color = _re[2];
+                                                }
+                                            }
+                                            ok([statusMessage, color])
+                                        }
+                                    } else {
+                                        ok(["FAILURE", 'red'])
+                                    }
+                                });
+                            } else if (e.status) {
+                                try {
+                                    request(e.status, {
+                                        timeout: 10000
+                                    }, (error, response, body) => {
+                                        if (!error && response.statusCode === 200) {
+                                            let statusMessage = body.toString();
+                                            let color = '';
+                                            if (e.replace) {
+                                                const replacement = e.replace.filter(f => body.toLowerCase().includes(f[0].toLowerCase()))
+                                                if (replacement.length > 0) {
+                                                    const _re = replacement.pop();
+                                                    statusMessage = _re[1];
+                                                    color = _re[2];
+                                                }
+                                            }
+                                            ok([statusMessage, color])
+                                        } else {
+                                            ok(["FAILURE", 'red'])
+                                        }
+                                    });
+                                } catch (e) {
+                                    ok(["ERROR", 'red'])
+                                }
+                            } else {
+                                ok(null)
+                            }
+                        })
+                    }))
+                }
+                statusMarkers[k] = statues
+                return true
+            }))
+        console.log(statusMarkers)
+    } catch (e) {
+        console.error(e);
+    }
+    refreshMarkers = setTimeout(() => {
+        scanStatusMarkers();
+    }, 60000)
+}

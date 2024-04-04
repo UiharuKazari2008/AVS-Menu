@@ -25,21 +25,71 @@ html
                     i.fa-regular(class=`fa-${icon}` style="padding-left: 0.35em;")
         ul
             each item, index in items
-                a(tabindex=0 href=`/device/${key}/${(item.children) ? 'menu' : (verify) ? 'verify' : 'send'}/${(item.children) ? index : `${parentIndex || '-1'}/${index}`}?_${Date.now()}`)
-                    li(class=`${(!captures && items.length - 1 === index) ? 'last' : ''}`)
-                        if (item.icon)
-                            div.icon-holder
-                                i.fa-regular(class=`fa-${item.icon}`)
-                        span(style="flex-grow: 1;") !{item.text}
-                        if (item.badges)
-                            div.badges
-                                each badge in item.badges
-                                    .badge(style=`${(badge.color) ? "background-color: " + badge.color + ";" : ''}`)
-                                        span(style=`${(badge.text_color) ? "color: " + badge.text_color + ";" : ''}`) !{badge.text}
-                        //if (item.children)
-                            i.fa-regular.fa-chevron-right(style="padding-left: 0.35em;")
-                        if (item.status)
-                            span.status(style=`padding-left: 0.35em; ${(item.status[1]) ? "color: " + item.status[1] + ";" : ''}`) !{item.status[0]}!{(item.append) ? item.append : ''}
+                if (item.slider)
+                    div.slider-item
+                        li(class=`${(!captures && items.length - 1 === index) ? 'last' : ''}`)
+                            if (item.children)
+                                a(style="flex-grow: 1;" tabindex=0 href=`/device/${key}/${(item.children) ? 'menu' : (verify) ? 'verify' : 'send'}/${(item.children) ? index : `${parentIndex || '-1'}/${index}`}?_${Date.now()}`)
+                                    if (item.icon)
+                                        div.icon-holder
+                                            i.fa-regular(class=`fa-${item.icon}`)
+                                    span !{item.text}
+                            else
+                                if (item.icon)
+                                    div.icon-holder
+                                        i.fa-regular(class=`fa-${item.icon}`)
+                                span(style="flex-grow: 1;") !{item.text}
+                            if (item.status)
+                                input.slider(style="flex-grow: 1;" type='range', min='0', max='100' value=item.status[0] id=`slider-${index}` onchange=`window.location.href = "/device/${key}/slider_value/${parentIndex || '-1'}/${index}/" + this.value; return false;`)
+                            if (item.status)
+                                span.status(style=`padding-left: 0.35em; ${(item.status[1]) ? "color: " + item.status[1] + ";" : ''}`) !{item.status[0]}!{(item.append) ? item.append : ''}
+                else if (item.toggle)
+                    div.slider-item
+                        li(class=`${(!captures && items.length - 1 === index) ? 'last' : ''}`)
+                            if (item.children)
+                                a(style="flex-grow: 1;" tabindex=0 href=`/device/${key}/${(item.children) ? 'menu' : (verify) ? 'verify' : 'send'}/${(item.children) ? index : `${parentIndex || '-1'}/${index}`}?_${Date.now()}`)
+                                    if (item.icon)
+                                        div.icon-holder
+                                            i.fa-regular(class=`fa-${item.icon}`)
+                                    span !{item.text}
+                            else
+                                if (item.icon)
+                                    div.icon-holder
+                                        i.fa-regular(class=`fa-${item.icon}`)
+                                span(style="flex-grow: 1;") !{item.text}
+                            div.toggle-holder
+                                a(tabindex=0 href=`/device/${key}/toggle_item/${parentIndex || '-1'}/${index}/0?_${Date.now()}` class=`${(item.status && item.isOn) ? "toggle-active" : ""}` style=`${(item.status && item.isOn && item.toggle[0].bg) ? "background-color: " + item.toggle[0].bg + "; " : ""}${(item.status && item.isOn && item.toggle[0].color) ? "color: " + item.toggle[0].color + "; " : ""}`)
+                                    if (item.toggle[0].icon)
+                                        div.icon-holder
+                                            i.fa-regular(class=`fa-${item.toggle[0].icon}`)
+                                    else if (item.toggle[0].text)
+                                        span !{item.toggle[0].text}
+                                    else
+                                        span ON
+                                a(tabindex=0 href=`/device/${key}/toggle_item/${parentIndex || '-1'}/${index}/1?_${Date.now()}` class=`${(!item.status || (item.status && item.isOn)) ? "" : "toggle-active"}` style=`${(!item.status || (item.status && item.isOn && item.toggle[1].bg)) ? "" : "background-color: " + item.toggle[1].bg + "; "}${(!item.status || (item.status && item.isOn && item.toggle[1].color)) ? "" :  "color: " + item.toggle[1].color + "; "}`)
+                                    if (item.toggle[1].icon)
+                                        div.icon-holder
+                                            i.fa-regular(class=`fa-${item.toggle[1].icon}`)
+                                    else if (item.toggle[1].text)
+                                        span !{item.toggle[1].text}
+                                    else
+                                        span OFF
+                else
+                    a(tabindex=0 href=`/device/${key}/${(item.children) ? 'menu' : (verify) ? 'verify' : 'send'}/${(item.children) ? index : `${parentIndex || '-1'}/${index}`}?_${Date.now()}`)
+                        li(class=`${(!captures && items.length - 1 === index) ? 'last' : ''}`)
+                            if (item.icon)
+                                div.icon-holder
+                                    i.fa-regular(class=`fa-${item.icon}`)
+                            span(style="flex-grow: 1;") !{item.text}
+                            if (item.badges)
+                                div.badges
+                                    each badge in item.badges
+                                        .badge(style=`${(badge.color) ? "background-color: " + badge.color + ";" : ''}`)
+                                            span(style=`${(badge.text_color) ? "color: " + badge.text_color + ";" : ''}`) !{badge.text}
+                            //if (item.children)
+                                i.fa-regular.fa-chevron-right(style="padding-left: 0.35em;")
+                            if (item.status)
+                                span.status(style=`padding-left: 0.35em; ${(item.status[1]) ? "color: " + item.status[1] + ";" : ''}`) !{item.status[0]}!{(item.append) ? item.append : ''}
             if (captures && !parentIndex && !inline)
                 a(href=`/device/${key}/captures`)
                     li.last
