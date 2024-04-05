@@ -350,6 +350,7 @@ app.listen(port, () => {
 let statusMarkers = {};
 let refreshMarkers = null;
 async function scanStatusMarkers(device) {
+    clearTimeout(refreshMarkers);
     try {
         const deviceList = JSON.parse(fs.readFileSync('./menu.json').toString());
         await Promise.all((Object.keys(deviceList.devices))
