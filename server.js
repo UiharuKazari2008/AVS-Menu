@@ -285,6 +285,7 @@ app.get('/device/:device/slider_value/:parent/:index/:value', async (req, res) =
 });
 app.get(['/device/:device/toggle_item/:parent/:index/:value', '/device/:device/tsend_item/:parent/:index/:value'], async (req, res) => {
     try {
+        console.log(req.baseUrl)
         const deviceList = JSON.parse(fs.readFileSync('./menu.json').toString());
         const deviceID = req.params.device;
         const menuData = deviceList.devices[deviceID];
@@ -311,7 +312,6 @@ app.get(['/device/:device/toggle_item/:parent/:index/:value', '/device/:device/t
                     ok(false)
                 }
             })
-            console.log(req.baseUrl)
             if (reqVerify) {
                 res.redirect(`/device/${deviceID}/toggle_verify/${index}/${req.params.index}/${req.params.value}`);
             } else {
