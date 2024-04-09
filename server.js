@@ -352,7 +352,7 @@ app.get(['/device/:device/verify/:parent/:index', '/device/:device/toggle_verify
             key: deviceID,
             ...selectedItem,
             parentIndex: req.params.index,
-            url: (req.params.value) ? `send/${req.params.parent}/${req.params.index}/${req.params.value}` : `toggle_item/${req.params.parent}/${req.params.index}`,
+            url: (req.params.value) ? `toggle_item/${req.params.parent}/${req.params.index}/${req.params.value}` : `send/${req.params.parent}/${req.params.index}`,
             inline: (req.headers['user-agent'].includes("OBS"))
         });
     } catch (e) {
