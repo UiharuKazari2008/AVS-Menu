@@ -89,6 +89,7 @@ app.get('/device/:device', async (req, res) => {
                     }
                     return undefined;
                 })()
+                console.log(isOn)
                 return {
                     ...e,
                     isOn,
