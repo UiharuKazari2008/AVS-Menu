@@ -359,7 +359,7 @@ async function scanStatusMarkers(device) {
                 const menuData = deviceList.devices[k];
                 let statues = [];
                 if (menuData && menuData.items) {
-                    const items = await Promise.all(menuData.items.map(async (e,i) => {
+                    await Promise.all(menuData.items.map(async (e,i) => {
                         statues[i] = await new Promise(ok => {
                             if (e.pre_status) {
                                 request(e.pre_status.url, {

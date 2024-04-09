@@ -65,7 +65,7 @@ html
                                     else if (item.toggle[0].text)
                                         span !{item.toggle[0].text}
                                     else
-                                        span ON
+                                        span I
                                 a(tabindex=0 href=`/device/${key}/toggle_item/${parentIndex || '-1'}/${index}/1?_${Date.now()}` class=`${(!item.status || (item.status && item.isOn)) ? "" : "toggle-active"}` style=`${(!item.status || (item.status && item.isOn && item.toggle[1].bg)) ? "" : "background-color: " + item.toggle[1].bg + "; "}${(!item.status || (item.status && item.isOn && item.toggle[1].color)) ? "" :  "color: " + item.toggle[1].color + "; "}`)
                                     if (item.toggle[1].icon)
                                         div.icon-holder
@@ -73,7 +73,7 @@ html
                                     else if (item.toggle[1].text)
                                         span !{item.toggle[1].text}
                                     else
-                                        span OFF
+                                        span O
                 else
                     a(tabindex=0 href=`/device/${key}/${(item.children) ? 'menu' : (verify) ? 'verify' : 'send'}/${(item.children) ? index : `${parentIndex || '-1'}/${index}`}?_${Date.now()}`)
                         li(class=`${(!captures && items.length - 1 === index) ? 'last' : ''}`)
