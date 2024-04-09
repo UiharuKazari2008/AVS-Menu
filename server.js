@@ -285,7 +285,7 @@ app.get('/device/:device/slider_value/:parent/:index/:value', async (req, res) =
 });
 app.get(['/device/:device/toggle_item/:parent/:index/:value', '/device/:device/tsend_item/:parent/:index/:value'], async (req, res) => {
     try {
-        console.log(req.baseUrl)
+        console.log(req)
         const deviceList = JSON.parse(fs.readFileSync('./menu.json').toString());
         const deviceID = req.params.device;
         const menuData = deviceList.devices[deviceID];
