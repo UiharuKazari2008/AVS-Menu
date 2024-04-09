@@ -347,7 +347,7 @@ app.get(['/device/:device/verify/:parent/:index', '/device/:device/toggle_verify
         const deviceID = req.params.device;
         const menuData = deviceList.devices[deviceID];
         const index = req.params.parent;
-        const selectedItem = (req.params.value) ? (index === '-1') ? menuData.items[req.params.index].toggle : menuData.items[index].children[req.params.index].toggle : (index === '-1') ? menuData.items[req.params.index] : menuData.items[index];
+        const selectedItem = (index === '-1') ? menuData.items[req.params.index] : menuData.items[index];
         res.render(`verify`, {
             key: deviceID,
             ...selectedItem,
