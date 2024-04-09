@@ -289,7 +289,7 @@ app.get('/device/:device/toggle_item/:parent/:index/:value', async (req, res) =>
         const deviceID = req.params.device;
         const menuData = deviceList.devices[deviceID];
         const index = req.params.parent;
-        const selectedItem = (index === '-1') ? menuData.items[req.params.index].toggle : menuData.items[index].children[req.params.index].toggle;
+        const selectedItem = (index === '-1') ? menuData.items[req.params.index] : menuData.items[index].children[req.params.index];
         try {
             const reqVerify = await new Promise(ok => {
                 if (selectedItem.warning && selectedItem.warning.check && selectedItem.warning.match) {
@@ -314,7 +314,7 @@ app.get('/device/:device/toggle_item/:parent/:index/:value', async (req, res) =>
             if (reqVerify) {
                 res.redirect(`/device/${deviceID}/toggle_verify/${index}/${req.params.index}/${req.params.value}`);
             } else {
-                request(selectedItem[parseInt(req.params.value)], async (error, response, body) => {
+                request(selectedItem.toggle[parseInt(req.params.value)], async (error, response, body) => {
                     if (!error && response.statusCode === 200) {
                         const statusMessage = body.toString();
                         await scanStatusMarkers(deviceID);
