@@ -59,9 +59,14 @@ html
                                 span(style="flex-grow: 1;") !{item.text}
                             div.toggle-holder
                                 each toggle_item, toggle_index in item.toggle
-                                    - isActive = (item.toggle.filter(e => e.match).length !== 0 && ((item.isOn !== undefined && item.isOn === toggle_index) || (item.isOn === undefined && item.toggle.length - 1 === toggle_index)))
-                                    a(tabindex=0 href=`/device/${key}/toggle_item/${parentIndex || '-1'}/${index}/${toggle_index}?_${Date.now()}` class=`${(isActive) ? "toggle-active" : ""}` style=`${(item.status && toggle_item.bg && isActive) ? "background-color: " + toggle_item.bg + "; " : ""}${(item.status && toggle_item.color && isActive) ? "color: " + toggle_item.color + "; " : ""}`)
-                                        if (toggle_item.icon)
+                                    - isActive = (item.toggle.filter(e => e.match).length !== 0 && ((item.isOn && item.isOn.key && item.isOn.key === toggle_index) || (item.isOn === undefined && item.toggle.length - 1 === toggle_index)))
+                                    a(tabindex=0 href=`/device/${key}/toggle_item/${parentIndex || '-1'}/${index}/${toggle_index}?_${Date.now()}` class=`${(isActive) ? "toggle-active" : ""}` style=`${(item.status && isActive) ? (item.isOn && item.isOn.match && item.isOn.match.bg) ? "background-color: " + item.isOn.match.bg + "; " : (toggle_item.bg) ? "background-color: " + toggle_item.bg + "; " : "" : ""}${(item.status && isActive) ? (item.isOn && item.isOn.match && item.isOn.match.color) ? "color: " + item.isOn.match.bg + "; " : (toggle_item.color) ? "color: " + toggle_item.color + "; " : "" : ""}`)
+                                        if (item.isOn && item.isOn.match && item.isOn.match.icon)
+                                            div.icon-holder
+                                                i.fa-regular(class=`fa-${item.isOn.match.icon}`)
+                                        else if (item.isOn && item.isOn.match && item.isOn.match.text)
+                                            span !{item.isOn.match.text}
+                                        else if (toggle_item.icon)
                                             div.icon-holder
                                                 i.fa-regular(class=`fa-${toggle_item.icon}`)
                                         else if (toggle_item.text)
