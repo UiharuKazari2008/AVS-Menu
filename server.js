@@ -84,7 +84,7 @@ app.get('/device/:device', async (req, res) => {
                             .map((f,fi) => {
                                 return { key: fi, ...f }
                             })
-                            .filter(f => f.match && f.match.filter(j => status[0].toLowerCase().includes(j.str.toString())).length !== 0)
+                            .filter(f => f.match && f.match.filter(j => j.str && status[0].toLowerCase().includes(j.str.toLowerCase())).length !== 0)
                         console.log(k)
                         return (k && k.length > 0) ? k[0] : undefined
                     }
