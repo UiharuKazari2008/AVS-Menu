@@ -283,7 +283,7 @@ app.get('/device/:device/slider_value/:parent/:index/:value', async (req, res) =
         });
     }
 });
-app.get('/device/:device/toggle_item/:parent/:index/:value', async (req, res) => {
+app.get(['/device/:device/toggle_item/:parent/:index/:value', '/device/:device/tsend_item/:parent/:index/:value'], async (req, res) => {
     try {
         const deviceList = JSON.parse(fs.readFileSync('./menu.json').toString());
         const deviceID = req.params.device;
@@ -311,7 +311,8 @@ app.get('/device/:device/toggle_item/:parent/:index/:value', async (req, res) =>
                     ok(false)
                 }
             })
-            if (reqVerify && !(req.referrer && req.referrer.includes("verify"))) {
+            console.log(req.baseUrl)
+            if (reqVerify) {
                 res.redirect(`/device/${deviceID}/toggle_verify/${index}/${req.params.index}/${req.params.value}`);
             } else {
                 request(selectedItem.toggle[parseInt(req.params.value)], async (error, response, body) => {
