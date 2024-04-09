@@ -85,7 +85,13 @@ app.get('/device/:device', async (req, res) => {
                                 return { key: fi, ...f }
                             })
                             .filter(f => f.match && f.match.filter(j => j.str && status[0].toLowerCase().includes(j.str.toLowerCase())).length !== 0)
-                        return (k && k.length > 0) ? k[0] : false
+                        if (k && k.length > 0) {
+                            return {
+                                ...k[0],
+                                match: (k[0].match) ? k[0].match.filter(j => j.str && status[0].toLowerCase().includes(j.str.toLowerCase())) : undefined,
+                            }
+                        }
+                        return k[k.length - 1]
                     }
                     return undefined;
                 })()
@@ -177,7 +183,13 @@ app.get('/device/:device/menu/:index', async (req, res) => {
                             return { key: fi, ...f }
                         })
                         .filter(f => f.match && f.match.filter(j => j.str && status[0].toLowerCase().includes(j.str.toLowerCase())).length !== 0)
-                    return (k && k.length > 0) ? k[0] : false
+                    if (k && k.length > 0) {
+                        return {
+                            ...k[0],
+                            match: (k[0].match) ? k[0].match.filter(j => j.str && status[0].toLowerCase().includes(j.str.toLowerCase())) : undefined,
+                        }
+                    }
+                    return k[k.length - 1]
                 }
                 return undefined;
             })()
