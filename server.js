@@ -88,7 +88,7 @@ app.get('/device/:device', async (req, res) => {
                         console.log(k)
                         return (k && k.length > 0) ? k[0] : undefined
                     }
-                    return undefined;
+                    return false;
                 })()
                 console.log(isOn)
                 return {
