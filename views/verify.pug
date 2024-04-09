@@ -30,7 +30,7 @@ html
                 span #{warning.header}
                 span(style="padding-top: 0.5em;") #{warning.message}
         ul
-            a(href=`/device/${key}/send/${url}`)
+            a(href=`/device/${key}/${url}`)
                 li
                     span !{warning.ok || "OK"}
             a(href=`/device/${key}/open`)
