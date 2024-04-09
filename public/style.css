@@ -20,7 +20,7 @@ ul {
 li {
     border-bottom: solid white 2pt;
     padding-bottom: 0.25em;
-    padding-top: calc(0.25em - 4px);
+    padding-top: 0.25em;
     display: flex;
     align-items: center;
     flex-direction: row;
@@ -206,7 +206,7 @@ a.image {
 }
 .toggle-holder > a > .icon-holder > i {
     font-size: 0.70em;
-    padding: 0 .5em;
+    padding: 0.16em .5em;
 }
 a.toggle-active {
     background: white;
@@ -228,4 +228,7 @@ a.toggle-active {
 .slider-item:active a.toggle-active {
     background-color: black;
     color: white;
+}
+.toggle-holder > a > .icon-holder {
+    padding-right: 0;
 }
