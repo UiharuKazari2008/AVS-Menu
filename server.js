@@ -86,9 +86,9 @@ app.get('/device/:device', async (req, res) => {
                             })
                             .filter(f => f.match && f.match.filter(j => j.str && status[0].toLowerCase().includes(j.str.toLowerCase())).length !== 0)
                         console.log(k)
-                        return (k && k.length > 0) ? k[0] : undefined
+                        return (k && k.length > 0) ? k[0] : false
                     }
-                    return false;
+                    return undefined;
                 })()
                 console.log(isOn)
                 return {
