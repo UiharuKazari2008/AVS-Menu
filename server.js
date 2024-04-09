@@ -293,7 +293,9 @@ app.get(['/device/:device/toggle_item/:parent/:index/:value', '/device/:device/t
         const selectedItem = (index === '-1') ? menuData.items[req.params.index] : menuData.items[index].children[req.params.index];
         try {
             const reqVerify = await new Promise(ok => {
-                if (selectedItem.warning && selectedItem.warning.check && selectedItem.warning.match) {
+                if (req.originalUrl && req.originalUrl.includes('tsend_item')) {
+                    ok(false)
+                } else if (selectedItem.warning && selectedItem.warning.check && selectedItem.warning.match) {
                     try {
                         request(selectedItem.warning.check, {timeout: 3000}, (error, response, body) => {
                             if (!error && response.statusCode === 200) {
@@ -312,7 +314,7 @@ app.get(['/device/:device/toggle_item/:parent/:index/:value', '/device/:device/t
                     ok(false)
                 }
             })
-            if (reqVerify) {
+            if (reqVerify && req.originalUrl && req.originalUrl.includes('toggle_item')) {
                 res.redirect(`/device/${deviceID}/toggle_verify/${index}/${req.params.index}/${req.params.value}`);
             } else {
                 request(selectedItem.toggle[parseInt(req.params.value)], async (error, response, body) => {
@@ -353,7 +355,7 @@ app.get(['/device/:device/verify/:parent/:index', '/device/:device/toggle_verify
             key: deviceID,
             ...selectedItem,
             parentIndex: req.params.index,
-            url: (req.params.value) ? `toggle_item/${req.params.parent}/${req.params.index}/${req.params.value}` : `send/${req.params.parent}/${req.params.index}`,
+            url: (req.params.value) ? `tsend_item/${req.params.parent}/${req.params.index}/${req.params.value}` : `send/${req.params.parent}/${req.params.index}`,
             inline: (req.headers['user-agent'].includes("OBS"))
         });
     } catch (e) {
