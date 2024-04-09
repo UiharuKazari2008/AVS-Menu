@@ -85,9 +85,9 @@ app.get('/device/:device', async (req, res) => {
                                 return { key: fi, ...f }
                             })
                             .filter(f => f.match && f.match.filter(j => status[0].toLowerCase().includes(j.toLowerCase())) )
-                        return (k && k.length > 0) ? k[0].key : -1
+                        return (k && k.length > 0) ? k[0].key : undefined
                     }
-                    return -1;
+                    return undefined;
                 })()
                 return {
                     ...e,
@@ -177,9 +177,9 @@ app.get('/device/:device/menu/:index', async (req, res) => {
                             return { key: fi, ...f }
                         })
                         .filter(f => f.match && f.match.filter(j => status[0].toLowerCase().includes(j.toLowerCase())) )
-                    return (k && k.length > 0) ? k[0].key : -1
+                    return (k && k.length > 0) ? k[0].key : undefined
                 }
-                return -1;
+                return undefined;
             })()
             return {
                 ...e,
