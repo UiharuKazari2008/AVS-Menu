@@ -78,7 +78,17 @@ app.get('/device/:device', async (req, res) => {
         if (menuData && menuData.items) {
             const items = menuData.items.map((e,i) => {
                 const status = (statusMarkers[deviceID]) ? statusMarkers[deviceID][i] : undefined
-                const isOn = (status && e.toggle_match) ? e.toggle_match.filter(e => status[0].toLowerCase().includes(e.toLowerCase())).length !== 0 : false
+                const isOn = (() => {
+                    if (status && e.toggle) {
+                        const k =  e.toggle
+                            .map((f,fi) => {
+                                return { key: fi, ...f }
+                            })
+                            .filter(f => f.match && f.match.filter(j => status[0].toLowerCase().includes(j.toLowerCase())) )
+                        return (k && k.length > 0) ? k[0].key : -1
+                    }
+                    return -1;
+                })()
                 return {
                     ...e,
                     isOn,
@@ -160,7 +170,17 @@ app.get('/device/:device/menu/:index', async (req, res) => {
                     ok(null)
                 }
             })
-            const isOn = (status && e.toggle_match) ? e.toggle_match.filter(e => status[0].toLowerCase().includes(e.toLowerCase())).length !== 0 : false
+            const isOn = (() => {
+                if (status && e.toggle) {
+                    const k =  e.toggle
+                        .map((f,fi) => {
+                            return { key: fi, ...f }
+                        })
+                        .filter(f => f.match && f.match.filter(j => status[0].toLowerCase().includes(j.toLowerCase())) )
+                    return (k && k.length > 0) ? k[0].key : -1
+                }
+                return -1;
+            })()
             return {
                 ...e,
                 isOn,

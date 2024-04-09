@@ -58,22 +58,17 @@ html
                                         i.fa-regular(class=`fa-${item.icon}`)
                                 span(style="flex-grow: 1;") !{item.text}
                             div.toggle-holder
-                                a(tabindex=0 href=`/device/${key}/toggle_item/${parentIndex || '-1'}/${index}/0?_${Date.now()}` class=`${(item.status && item.isOn) ? "toggle-active" : ""}` style=`${(item.status && item.isOn && item.toggle[0].bg) ? "background-color: " + item.toggle[0].bg + "; " : ""}${(item.status && item.isOn && item.toggle[0].color) ? "color: " + item.toggle[0].color + "; " : ""}`)
-                                    if (item.toggle[0].icon)
-                                        div.icon-holder
-                                            i.fa-regular(class=`fa-${item.toggle[0].icon}`)
-                                    else if (item.toggle[0].text)
-                                        span !{item.toggle[0].text}
-                                    else
-                                        span I
-                                a(tabindex=0 href=`/device/${key}/toggle_item/${parentIndex || '-1'}/${index}/1?_${Date.now()}` class=`${(!item.status || (item.status && item.isOn)) ? "" : "toggle-active"}` style=`${(!item.status || (item.status && item.isOn && item.toggle[1].bg)) ? "" : "background-color: " + item.toggle[1].bg + "; "}${(!item.status || (item.status && item.isOn && item.toggle[1].color)) ? "" :  "color: " + item.toggle[1].color + "; "}`)
-                                    if (item.toggle[1].icon)
-                                        div.icon-holder
-                                            i.fa-regular(class=`fa-${item.toggle[1].icon}`)
-                                    else if (item.toggle[1].text)
-                                        span !{item.toggle[1].text}
-                                    else
-                                        span O
+                                each toggle_item, toggle_index in item.toggle
+                                    a(tabindex=0 href=`/device/${key}/toggle_item/${parentIndex || '-1'}/${index}/${toggle_index}?_${Date.now()}` class=`${(item.status && item.isOn) ? "toggle-active" : ""}` style=`${(item.status && item.isOn && item.isOn === toggle_index && toggle_item.bg) ? "background-color: " + toggle_item.bg + "; " : ""}${(item.status && item.isOn && item.isOn === toggle_index && toggle_item.color) ? "color: " + toggle_item.color + "; " : ""}`)
+                                        if (toggle_item.icon)
+                                            div.icon-holder
+                                                i.fa-regular(class=`fa-${toggle_item.icon}`)
+                                        else if (toggle_item.text)
+                                            span !{toggle_item.text}
+                                        else if (item.toggle.length <= 2)
+                                            span !{(toggle_index === 1) ? "I" : "O"}
+                                        else
+                                            span !{toggle_index}
                 else
                     a(tabindex=0 href=`/device/${key}/${(item.children) ? 'menu' : (verify) ? 'verify' : 'send'}/${(item.children) ? index : `${parentIndex || '-1'}/${index}`}?_${Date.now()}`)
                         li(class=`${(!captures && items.length - 1 === index) ? 'last' : ''}`)

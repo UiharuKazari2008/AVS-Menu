@@ -197,6 +197,8 @@ a.image {
 .toggle-holder > a {
     display: flex;
     align-items: center;
+    min-width: 1.3em;
+    justify-content: center;
 }
 .toggle-holder > a > span {
     font-size: 0.70em;
