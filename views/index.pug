@@ -61,6 +61,8 @@ html
                                 each toggle_item, toggle_index in item.toggle
                                     - isActive = (item.status && item.toggle.filter(e => e.match).length !== 0 && ((item.isOn && item.isOn.key !== undefined && item.isOn.key === toggle_index) || (item.isOn === false && item.toggle.length - 1 === toggle_index)))
                                     a(tabindex=0 href=`/device/${key}/toggle_item/${parentIndex || '-1'}/${index}/${toggle_index}?_${Date.now()}` class=`${(isActive) ? "toggle-active" : ""}` style=`${(isActive) ? (item.isOn && item.isOn.match && item.isOn.match.bg) ? "background-color: " + item.isOn.match.bg + "; " : (toggle_item.bg) ? "background-color: " + toggle_item.bg + "; " : "" : ""}${(isActive) ? (item.isOn && item.isOn.match && item.isOn.match.color) ? "color: " + item.isOn.match.bg + "; " : (toggle_item.color) ? "color: " + toggle_item.color + "; " : "" : ""}`)
+                                        if (item.isOn)
+                                            - console.log(item.isOn)
                                         if (item.isOn && item.isOn.match && item.isOn.match.icon)
                                             div.icon-holder
                                                 i.fa-regular(class=`fa-${item.isOn.match.icon}`)
