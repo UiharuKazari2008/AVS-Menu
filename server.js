@@ -85,7 +85,7 @@ app.get('/device/:device', async (req, res) => {
                                 return { key: fi, ...f }
                             })
                             .filter(f => f.match && f.match.filter(j => status[0].toLowerCase().includes(j.toLowerCase())) )
-                        console.log(k)
+                        console.log(status[0], k[0])
                         return (k && k.length > 0) ? k[0].key : undefined
                     }
                     return undefined;
