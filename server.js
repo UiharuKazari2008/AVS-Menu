@@ -311,7 +311,7 @@ app.get('/device/:device/toggle_item/:parent/:index/:value', async (req, res) =>
                     ok(false)
                 }
             })
-            if (reqVerify) {
+            if (reqVerify && !(req.referrer && req.referrer.includes("verify"))) {
                 res.redirect(`/device/${deviceID}/toggle_verify/${index}/${req.params.index}/${req.params.value}`);
             } else {
                 request(selectedItem.toggle[parseInt(req.params.value)], async (error, response, body) => {
