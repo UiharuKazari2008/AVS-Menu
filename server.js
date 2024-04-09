@@ -88,10 +88,10 @@ app.get('/device/:device', async (req, res) => {
                         if (k && k.length > 0) {
                             return {
                                 ...k[0],
-                                match: (k[0].match) ? k[0].match.filter(j => j.str && status[0].toLowerCase().includes(j.str.toLowerCase())) : undefined,
+                                match: (k[0].match) ? k[0].match.filter(j => j.str && status[0].toLowerCase().includes(j.str.toLowerCase()))[0] : undefined,
                             }
                         }
-                        return k[k.length - 1]
+                        return false
                     }
                     return undefined;
                 })()
