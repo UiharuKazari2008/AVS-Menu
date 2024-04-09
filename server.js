@@ -456,7 +456,6 @@ async function scanStatusMarkers(device) {
                 statusMarkers[k] = statues
                 return true
             }))
-        console.log(statusMarkers)
     } catch (e) {
         console.error(e);
     }
