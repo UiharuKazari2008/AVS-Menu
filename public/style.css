@@ -28,7 +28,7 @@ li {
 }
 li.last {
     border-bottom: none;
-    margin-bottom: 2em;
+    margin-bottom: 3em;
 }
 a:hover > li,
 a:focus > li,
