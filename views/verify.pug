@@ -25,7 +25,7 @@ html
                     i.fa-regular(class=`fa-${icon}` style="padding-left: 0.35em;")
         div.error-box
             div.error-icon
-                i.fa-regular.fa-3x(class=`fa-${warning.icon || "exclamation-triangle"}` style=`${(warning.icon_color) ? "color: " + warning.icon_color + "; " : '' }`)
+                i.fa-regular.fa-3x(class=`fa-${(warning.icon) ? warning.icon : "exclamation-triangle"}` style=`${(warning.icon_color) ? "color: " + warning.icon_color + "; " : '' }`)
             div.error-text
                 span #{warning.header}
                 span(style="padding-top: 0.5em;") #{warning.message}
